@@ -70,17 +70,29 @@ function mouseOverCanvas() {
     ctx.strokeStyle = OptionMenu.color;
     ctx.lineWidth = OptionMenu.brushSize;
     ctx.lineJoin = "round";
-    ctx.beginPath();
+
     if (lastPoint !== null) {
+        ctx.beginPath();
         ctx.moveTo(lastPoint.x, lastPoint.y);
         ctx.lineTo(mouseX, mouseY);
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(lastPoint.x + ((canvas.width / 2) - lastPoint.x) * 2, lastPoint.y);
+        ctx.lineTo(mouseX + ((canvas.width / 2) - mouseX) * 2, mouseY);
+        ctx.closePath();
+        ctx.stroke();
+
+
     }
     else {
+        ctx.beginPath();
         ctx.moveTo(mouseX, mouseY);
         ctx.lineTo(mouseX, mouseY);
+        ctx.closePath();
+        ctx.stroke();
     }
-    ctx.closePath();
-    ctx.stroke();
 }
 
 function updateOptions() {

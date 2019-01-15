@@ -4,9 +4,7 @@ var hold = false;
 var interval;
 var mouseX, mouseY;
 var windowHeightOffset, windowWidthOffset;
-var color, brushSize;
 var lastPoint;
-
 var OptionMenu;
 
 
@@ -15,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     canvas = document.getElementById("paint-canvas");
     ctx = canvas.getContext('2d');
 
+    let x = setInterval(updateOptions, 10);
 
     OptionMenu = {
         color: "black",
@@ -32,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateCanvasSize();
     updateOptions();
 
-    canvas.addEventListener("resize", updateCanvasSize);
+    window.addEventListener("resize", updateCanvasSize);
     canvas.addEventListener("mousedown", mouseDownCanvas);
     canvas.addEventListener("mouseup", mouseUpCanvas);
     canvas.addEventListener("mousemove", mouseMoveCanvas);
@@ -67,28 +66,54 @@ function mouseMoveCanvas(e) {
 }
 
 function mouseOverCanvas() {
+
+    if (lastPoint !== null) {
+        drawLine(lastPoint, { x: mouseX, y: mouseY });
+        drawLine(
+            { x: lastPoint.x, y: lastPoint.y + ((canvas.height / 2) - lastPoint.y) * 2 },
+            { x: mouseX, y: mouseY + ((canvas.height / 2) - mouseY) * 2 }
+        );
+        drawLine(
+            { x: lastPoint.x + ((canvas.width / 2) - lastPoint.x) * 2, y: lastPoint.y },
+            { x: mouseX + ((canvas.width / 2) - mouseX) * 2, y: mouseY }
+        );
+        drawLine(
+            { x: lastPoint.x + ((canvas.width / 2) - lastPoint.x) * 2, y: lastPoint.y + ((canvas.height / 2) - lastPoint.y) * 2 },
+            { x: mouseX + ((canvas.width / 2) - mouseX) * 2, y: mouseY + ((canvas.height / 2) - mouseY) * 2 }
+        );
+    }
+    else {
+        drawLine({ x: mouseX, y: mouseY }, { x: mouseX, y: mouseY });
+    }
+
+}
+
+function drawLine(from, to) {
     ctx.strokeStyle = OptionMenu.color;
     ctx.lineWidth = OptionMenu.brushSize;
     ctx.lineJoin = "round";
+
     ctx.beginPath();
-    if (lastPoint !== null) {
-        ctx.moveTo(lastPoint.x, lastPoint.y);
-        ctx.lineTo(mouseX, mouseY);
-    }
-    else {
-        ctx.moveTo(mouseX, mouseY);
-        ctx.lineTo(mouseX, mouseY);
-    }
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
     ctx.closePath();
     ctx.stroke();
 }
 
 function updateOptions() {
-    OptionMenu.color = document.querySelector("#color-picker input").value;
+    OptionMenu.color = getRandomColor();
     OptionMenu.brushSize = document.querySelector("#brush-size input").value;
 }
 
+function getRandomColor() {
+    var r = Math.floor(Math.random() * 1000 % 256);
+    var g = Math.floor(Math.random() * 1000 % 256)
+    var b = Math.floor(Math.random() * 1000 % 256)
+    let color = `rgb(${r},${g},${b})`;
+    return color;
+}
+
 function fillCanvas() {
-    ctx.fillStyle = OptionMenu.color;
+    ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
